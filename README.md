@@ -17,5 +17,20 @@
 # Creating CI
 The end goal for this task is to push some sort of change to our Github repo, and have Jenkins automatically test the new code.
 If the pushed code passes the tests, we want Jenkins to automatically merge our changes into the 'main' branch.
-## Creating a Jenkins job
 
+## Creating a Jenkins job
+1. Go to your Jenkins page and select `New Item` at the top of the main menu list
+
+    ![](./img/Jenkins_main_menu.PNG)
+
+2. Enter a logical name for the job and select `Freestyle project`. Click `OK`.
+
+---
+1. Select the `Discard old builds` check-box and change the `Max # of builds to keep` to 3
+2. Select the `GitHub project` check-box and input the relevant GitHub HTTPS link
+
+![](./img/GitHub_http_url.PNG)
+
+3. Select the `Restrict where this project can be run` check-box and in `	Label Expression`, input `sparta-ubuntu-node`.
+4. Under `Source Code Management`, select the `Git` radio-button.
+Under `Repositories`, input the SSH url in `Repository URL`
