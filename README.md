@@ -61,3 +61,39 @@ Under `Repositories`, input the SSH url (from the green `Code` button) in `Repos
 9. Under `Build`, select `Execute shell`.
 10. Input the shell commands that you want to execute in this build.
 11. Save and apply!
+
+# Automating Jenkins to merge branches
+Jenkins can be used in such a way that a developer can push there changes to a branch (like the `dev` branch) and then have their new code be automatically tested. If the tests pass, then Jenkins can automatically merge the `dev` branch with `main` branch, pushing the changes into production.
+
+1. Edit your testing job and go to the bottom of the page.
+2. Under `Post-build Actions`, select `Build other project`.
+3. In `Projects to build`, input a name along the line of `Merge_to_main` or `Dev_merge_main`, and select `Trigger build only if the build is stable` *(meaning that the code pushes passed the tests)*
+4. **SAVE**
+5. Create a new `Freestyle project` item
+6. Select `Discard old builds` and enter an appropriate number
+7. Select `GitHub project` and input your repo's HTTPS link
+8. Select `Restrict where this project can be run` and choose `sparta-ubuntu-node`
+9. Under `Source Code Managment`, select `Git` and input the SSH link for your repo.
+10. Add the private key that matches the public key that you put in the repo's `Deploy keys`
+11. In `Branch Specifier`, specify the `dev` branch (`*/dev`)
+12. For `Additional Behaviours`, select `Merge before build`.
+    - Name of repository = origin
+    - Branch to merge to = main
+    - merge strategy = default
+    - Fast-forward mode = --ff
+13. Under `Build Triggers`, select `GitHub hook trigger for GITScm polling`
+14. Under `Build Environment`, select `Provide Node & npm bin/ folder to PATH` and choose `Sparta-Node-JS`
+15. Under `Post-build Actions`, add `Git Publisher`
+16. Select `Push Only If Build Succeeds	` and `Merge Results`
+17. Save and apply!
+
+# Allowing Jenkins to SSH into an EC2
+In order to allow Jenkins to SSH into an EC2 instance and perform commands in its CLI, we need to give Jenkins the required SSH key. We also need to bypass the initial `yes/no/fingerprint` option.
+
+## Giving Jenkins the SSH key
+1. Under `Build Environment`, select `SSH Agent`
+2. Select `Specfic credentials` and click `Add`
+3. Select `SSH Username with private key` and input a logical key name with private key details *(This needs to be AWS key used to access the EC2 instance with the `ssh -i "sre_key.pem" ubuntu@ec2-34-245-102-139.eu-west-1.compute.amazonaws.com` command)*
+
+## Bypass the input option on the first connection
+The command required to bypass the intial connection prompt is > `ssh -A -o "StrictHostKeyChecking=no" ubuntu@34.240.7.39`
